@@ -65,32 +65,41 @@
 #include <QtGui>
 #endif
 
+#include <QDebug>
 #include "toolwindowmanager.h"
 #include "ui_toolwindowmanager.h"
+
+#include "terminalwidget.h"
+
 
 ToolWindowManager::ToolWindowManager(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::ToolWindowManager)
 {
     ui->setupUi(this);
+ /*
     connect(ui->toolWindowManager, SIGNAL(toolWindowVisibilityChanged(QWidget*,bool)),
             this, SLOT(toolWindowVisibilityChanged(QWidget*,bool)));
-
-    QList<QPushButton*> toolWindows;
-    for (int i = 0; i < 6; i++) {
-        QPushButton *b1 = new QPushButton(QString("tool%1").arg(i + 1));
-        b1->setWindowTitle(b1->text());
-        b1->setObjectName(b1->text());
-        QAction *action = ui->menuToolWindows->addAction(b1->text());
+ */
+    QList<TerminalWidget*> toolWindows;
+    for (int i = 0; i < 2; i++) {
+        //auto b1 = new TerminalWidget(this,false);
+        TerminalWidget *b1 = new TerminalWidget(this,true);
+        b1->setWindowTitle("Term "+QString::number(i));
+        b1->setObjectName("Term "+QString::number(i));
+        
+        QAction *action = ui->menuToolWindows->addAction(QString::number(i));
         action->setData(i);
+        connect(action, SIGNAL(triggered(bool)), this, SLOT(toolWindowActionToggled(bool)));
         action->setCheckable(true);
         action->setChecked(true);
-        connect(action, SIGNAL(triggered(bool)), this, SLOT(toolWindowActionToggled(bool)));
         actions << action;
         toolWindows << b1;
     }
-    ui->toolWindowManager->addToolWindow(toolWindows[0], QToolWindowManager::EmptySpaceArea);
+    //auto t1 = new TerminalWidget(this,true);
+    ui->toolWindowManager->addToolWindow(toolWindows[0], QToolWindowManager::LastUsedArea);
     ui->toolWindowManager->addToolWindow(toolWindows[1], QToolWindowManager::LastUsedArea);
+    /*
     ui->toolWindowManager->addToolWindow(toolWindows[2], QToolWindowManager::LastUsedArea);
     ui->toolWindowManager->addToolWindow(toolWindows[3],
             QToolWindowManager::ReferenceLeftOf, ui->toolWindowManager->areaFor(toolWindows[2]));
@@ -106,7 +115,7 @@ ToolWindowManager::ToolWindowManager(QWidget *parent) :
     tabButton2->setText(tr("t2"));
 
     ui->toolWindowManager->setTabButton(toolWindows[3], QTabBar::LeftSide, tabButton2);
-
+     */
     resize(600, 400);
     on_actionRestoreState_triggered();
 }
@@ -118,6 +127,7 @@ ToolWindowManager::~ToolWindowManager()
 
 void ToolWindowManager::toolWindowActionToggled(bool state)
 {
+    qDebug()<<" toolWindowActionToggled " <<state;
     int index = static_cast<QAction*>(sender())->data().toInt();
     QWidget *toolWindow = ui->toolWindowManager->toolWindows()[index];
     ui->toolWindowManager->moveToolWindow(toolWindow, state ?
@@ -160,3 +170,11 @@ void ToolWindowManager::on_actionClosableTabs_toggled(bool checked)
 {
     ui->toolWindowManager->setTabsClosable(checked);
 }
+
+void ToolWindowManager::on_actionNewTerminal_triggered()
+{
+    TerminalWidget *b1 = new TerminalWidget(this,true);
+    ui->toolWindowManager->addToolWindow(b1, QToolWindowManager::LastUsedArea);
+}
+
+
