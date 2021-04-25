@@ -1,0 +1,3 @@
+[submodule "qtterminalwidget"]
+	path = qtterminalwidget
+	url = https://github.com/jacob3141/qtterminalwidget.git
