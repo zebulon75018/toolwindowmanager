@@ -38,7 +38,7 @@
      <x>0</x>
      <y>0</y>
      <width>400</width>
-     <height>23</height>
+     <height>22</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuToolWindows">
@@ -60,9 +60,16 @@
     </property>
     <addaction name="actionClosableTabs"/>
    </widget>
+   <widget class="QMenu" name="menuFile">
+    <property name="title">
+     <string>Terminal</string>
+    </property>
+    <addaction name="actionNewTerminal"/>
+   </widget>
    <addaction name="menuToolWindows"/>
    <addaction name="menuOptions"/>
    <addaction name="menuConfig"/>
+   <addaction name="menuFile"/>
   </widget>
   <widget class="QStatusBar" name="statusBar"/>
   <action name="actionSaveState">
@@ -89,6 +96,14 @@
    </property>
    <property name="text">
     <string>Closable tabs</string>
+   </property>
+  </action>
+  <action name="actionNewTerminal">
+   <property name="text">
+    <string>New Terminal</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+N</string>
    </property>
   </action>
  </widget>

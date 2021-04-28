@@ -59,15 +59,39 @@
 ****************************************************************************/
 
 #include <QApplication>
-
 #include "toolwindowmanager.h"
+
+#define QAPPLICATION_CLASS QApplication
+
+#include <singleapplication.h>
 
 int main(int argc, char *argv[])
 {
-    QApplication app(argc, argv);
+    SingleApplication app( argc, argv, true );
+
+
+    ToolWindowManager manager(NULL,argc,argv);
+   // If this is a secondary instance
+  
+    if( app.isSecondary() ) {
+        app.sendMessage( app.arguments().join(' ').toUtf8() );
+        qDebug() << "App already running.";
+        qDebug() << "Primary instance PID: " << app.primaryPid();
+        qDebug() << "Primary instance user: " << app.primaryUser();
+        return 0;
+    } else {
+        QObject::connect(
+            &app,
+            &SingleApplication::receivedMessage,
+            &manager,
+            &ToolWindowManager::receivedMessage
+        );
+    }
+   
+
+    //QApplication app(argc, argv);
     app.setOrganizationName("QtProject");
     app.setApplicationName("ToolWindowManagerTest");
-    ToolWindowManager manager;
     manager.show();
     return app.exec();
 }

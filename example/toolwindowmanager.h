@@ -62,6 +62,7 @@
 #define TOOLWINDOWMANAGER_H
 
 #include <QMainWindow>
+#include "terminalwidget.h"
 
 namespace Ui {
 class ToolWindowManager;
@@ -71,12 +72,16 @@ class ToolWindowManager : public QMainWindow
 {
     Q_OBJECT
 public:
-    explicit ToolWindowManager(QWidget *parent = 0);
+    explicit ToolWindowManager(QWidget *parent ,int argc, char **argv);
     ~ToolWindowManager();
+
+public slots:
+    void receivedMessage( int instanceId, QByteArray message );
 
 private:
     Ui::ToolWindowManager *ui;
     QList<QAction*> actions;
+    QList<TerminalWidget*> lstTerminal;
 
 private slots:
     void toolWindowActionToggled(bool state);
@@ -85,6 +90,7 @@ private slots:
     void on_actionRestoreState_triggered();
     void on_actionClearState_triggered();
     void on_actionClosableTabs_toggled(bool checked);
+    void on_actionNewTerminal_triggered();
 };
 
 #endif

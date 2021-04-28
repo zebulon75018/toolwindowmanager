@@ -72,7 +72,7 @@
 #include "terminalwidget.h"
 
 
-ToolWindowManager::ToolWindowManager(QWidget *parent) :
+ToolWindowManager::ToolWindowManager(QWidget *parent,int argc, char **argv) :
     QMainWindow(parent),
     ui(new Ui::ToolWindowManager)
 {
@@ -82,9 +82,25 @@ ToolWindowManager::ToolWindowManager(QWidget *parent) :
             this, SLOT(toolWindowVisibilityChanged(QWidget*,bool)));
  */
     QList<TerminalWidget*> toolWindows;
-    for (int i = 0; i < 2; i++) {
+      TerminalWidget *b1 = new TerminalWidget(this,false);
+        if ( argc>1) {
+                b1->setShellProgram(argv[1]);
+		QStringList larg ;
+                for(int n=2;n < argc; n++) larg << argv[n];
+                b1->setShellProgramArguments(larg);
+                b1->startShellProgram();
+        	b1->setWindowTitle(argv[1]);
+        	b1->setObjectName(argv[1]);
+        } else {
+        b1->setWindowTitle("Term "+QString::number(1));
+        b1->setObjectName("Term "+QString::number(1));
+        }
+	lstTerminal << b1;
+        toolWindows << b1;
+/*
+    for (int i = 0; i < 1; i++) {
         //auto b1 = new TerminalWidget(this,false);
-        TerminalWidget *b1 = new TerminalWidget(this,true);
+        TerminalWidget *b1 = new TerminalWidget(this,false);
         b1->setWindowTitle("Term "+QString::number(i));
         b1->setObjectName("Term "+QString::number(i));
         
@@ -95,10 +111,11 @@ ToolWindowManager::ToolWindowManager(QWidget *parent) :
         action->setChecked(true);
         actions << action;
         toolWindows << b1;
-    }
+    } 
+ */
     //auto t1 = new TerminalWidget(this,true);
     ui->toolWindowManager->addToolWindow(toolWindows[0], QToolWindowManager::LastUsedArea);
-    ui->toolWindowManager->addToolWindow(toolWindows[1], QToolWindowManager::LastUsedArea);
+    //ui->toolWindowManager->addToolWindow(toolWindows[1], QToolWindowManager::LastUsedArea);
     /*
     ui->toolWindowManager->addToolWindow(toolWindows[2], QToolWindowManager::LastUsedArea);
     ui->toolWindowManager->addToolWindow(toolWindows[3],
@@ -116,7 +133,7 @@ ToolWindowManager::ToolWindowManager(QWidget *parent) :
 
     ui->toolWindowManager->setTabButton(toolWindows[3], QTabBar::LeftSide, tabButton2);
      */
-    resize(600, 400);
+    resize(800, 600);
     on_actionRestoreState_triggered();
 }
 
@@ -177,4 +194,23 @@ void ToolWindowManager::on_actionNewTerminal_triggered()
     ui->toolWindowManager->addToolWindow(b1, QToolWindowManager::LastUsedArea);
 }
 
+
+void ToolWindowManager::receivedMessage(int instanceId, QByteArray message)
+{
+    qDebug() << "Received message from instance: " << instanceId;
+    QStringList tmp = QString::fromUtf8( message ).split(" ");
+    TerminalWidget *b1 = new TerminalWidget(this,false);
+    if (tmp.length() >1 ) 
+    {
+      b1->setShellProgram(tmp[1]);
+      QStringList larg ;
+      for(int n=2;n < tmp.length(); n++) larg << tmp[n];
+      b1->setShellProgramArguments(larg);
+      b1->setWindowTitle(tmp[1]);
+      b1->setObjectName(tmp[1]);
+    }
+    lstTerminal << b1;
+    b1->startShellProgram();
+    ui->toolWindowManager->addToolWindow(b1, QToolWindowManager::LastUsedArea);
+}
 
